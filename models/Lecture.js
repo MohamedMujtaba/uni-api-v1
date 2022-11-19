@@ -6,6 +6,10 @@ const LectureSchema = Schema({
     type: String,
     require: [true, "Title is required"],
   },
+  code: {
+    type: String,
+    require: [true, "Title is required"],
+  },
   date: {
     type: String,
     require: [true, "Date is required"],

@@ -2,7 +2,7 @@ const { StatusCodes } = require("http-status-codes");
 const Lecture = require("../models/Lecture");
 
 const createLecture = async (req, res) => {
-  const { title, date, time, hall, dep, year, status, note } = req.body;
+  const { title, date, time, hall, dep, year, status, note, code } = req.body;
   const lectures = await Lecture.find({
     year,
     dep,
@@ -26,6 +26,7 @@ const createLecture = async (req, res) => {
         year,
         note,
         status,
+        code,
       });
       res.status(StatusCodes.CREATED).json({ lecture });
     } else {
@@ -41,10 +42,14 @@ const createLecture = async (req, res) => {
 };
 
 const getAllLectures = async (req, res) => {
-  const { title, date, time, hall, dep, year, status, sort, limit } = req.query;
+  const { title, date, time, hall, dep, year, status, sort, limit, code } =
+    req.query;
   let queryObject = {};
   if (title) {
     queryObject.title = title;
+  }
+  if (code) {
+    queryObject.code = { $all: code };
   }
   if (date) {
     queryObject.date = date;
