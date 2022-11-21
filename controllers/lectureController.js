@@ -2,7 +2,7 @@ const { StatusCodes } = require("http-status-codes");
 const Lecture = require("../models/Lecture");
 
 const createLecture = async (req, res) => {
-  const { title, date, time, hall, dep, year, status, note, code } = req.body;
+  const { title, date, time, hall, dep, year, status, note, codes } = req.body;
   const lectures = await Lecture.find({
     year,
     dep,
@@ -26,7 +26,7 @@ const createLecture = async (req, res) => {
         year,
         note,
         status,
-        code,
+        codes,
       });
       res.status(StatusCodes.CREATED).json({ lecture });
     } else {
@@ -42,14 +42,17 @@ const createLecture = async (req, res) => {
 };
 
 const getAllLectures = async (req, res) => {
-  const { title, date, time, hall, dep, year, status, sort, limit, code } =
+  const { title, date, time, hall, dep, year, status, sort, limit, codes } =
     req.query;
+  // let c1 = codes.split({});
+  // let c2 = JSON.parse(codes);
+  // console.log("split", c1);
+  // console.log("JSON", c2);
+  // console.log(codes.split(","));
+  // console.log(JSON.parse(codes));
   let queryObject = {};
   if (title) {
     queryObject.title = title;
-  }
-  if (code) {
-    queryObject.code = { $all: code };
   }
   if (date) {
     queryObject.date = date;
@@ -69,8 +72,42 @@ const getAllLectures = async (req, res) => {
   if (status) {
     queryObject.status = status;
   }
-  let result = Lecture.find(queryObject);
 
+  let result;
+  if (codes) {
+    let c = codes.split(",");
+    result = Lecture.find({
+      ...queryObject,
+      code: {
+        $in: c,
+      },
+    });
+  } else {
+    result = Lecture.find(queryObject);
+  }
+  // result = Lecture.find(queryObject);
+  // let result = Lecture.find(queryObject);
+
+  // let result = Lecture.find({
+  //   ...queryObject,
+  //   code: {
+  //     $in: codes.split(","),
+  //   },
+  // });
+  // let result;
+  // if (code) {
+  //   console.log(code);
+  //   result = Lecture.find({
+  //     ...queryObject,
+  //     ...{
+  //       code: {
+  //         $in: code,
+  //       },
+  //     },
+  //   });
+  // } else {
+  //   result = Lecture.find(queryObject);
+  // }
   // sort
   if (sort) {
     const sortList = sort.split(",").join(" ");
@@ -84,6 +121,9 @@ const getAllLectures = async (req, res) => {
   }
   const lectures = await result;
   res.status(StatusCodes.OK).json({ lectures });
+  // let c2 = Array.from(codes.split(","));
+
+  // res.status(StatusCodes.OK).json(c2);
 };
 const getOneLecture = async (req, res) => {
   const { id } = req.params.id;

@@ -7,6 +7,10 @@ const UserSchema = Schema({
     type: String,
     require: [true, "Name is required"],
   },
+  codes: {
+    type: String,
+    default: "",
+  },
   role: {
     type: String,
     require: true,
@@ -22,7 +26,7 @@ const UserSchema = Schema({
   },
   dep: {
     type: String,
-    require: true,
+    default: "",
     enum: {
       values: ["Pet", "EE", "Mec", "Civ", "Agr", "Min", "Chem", "Sur"],
       message: "{VALUE} is not supported",
@@ -30,7 +34,7 @@ const UserSchema = Schema({
   },
   year: {
     type: String,
-    require: true,
+    default: "",
   },
 });
 
