@@ -1,5 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const Lecture = require("../models/Lecture");
+const pushMsg = require("../utils/expoPushNotification");
 
 const createLecture = async (req, res) => {
   const { title, date, time, hall, dep, year, status, note, codes } = req.body;
@@ -29,6 +30,7 @@ const createLecture = async (req, res) => {
         codes,
       });
       res.status(StatusCodes.CREATED).json({ lecture });
+      pushMsg(lecture);
     } else {
       res
         .status(StatusCodes.NOT_ACCEPTABLE)
@@ -160,6 +162,7 @@ const updateLecture = async (req, res) => {
     new: true,
   });
   res.status(StatusCodes.OK).json({ lecture });
+  pushMsg(lecture);
 };
 const getDays = async (req, res) => {
   const { year, dep, limit } = req.query;
@@ -196,6 +199,21 @@ const getNumberOfLectures = async (req, res) => {
   ]);
   res.status(StatusCodes.OK).json({ lectures });
 };
+
+const getGroupedLectures = async (req, res) => {
+  const { dep, year } = req.query;
+  const lectures = await Lecture.aggregate([
+    { $match: { dep: dep, year: year } },
+    { $sort: { time: 1 } },
+    {
+      $group: {
+        _id: "$date",
+        lectures: { $push: "$$ROOT" },
+      },
+    },
+  ]);
+  res.status(StatusCodes.OK).json({ lectures });
+};
 module.exports = {
   createLecture,
   getAllLectures,
@@ -205,4 +223,5 @@ module.exports = {
   updateLecture,
   getDays,
   getNumberOfLectures,
+  getGroupedLectures,
 };
