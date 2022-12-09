@@ -1,12 +1,12 @@
 const { Expo } = require("expo-server-sdk");
-const pushMsg = (lecture, pushTokens) => {
+const pushMsg = (lecture, pushTokens = []) => {
   // Create a new Expo SDK client
   // optionally providing an access token if you have enabled push security
   let expo = new Expo({ accessToken: process.env.EXPO_ACCESS_TOKEN });
 
   // Create the messages that you want to send to clients
   let messages = [];
-  for (let pushToken of ["ExponentPushToken[NcThnpK0RPSCargPNslwKl]"]) {
+  for (let pushToken of pushTokens) {
     // Each push token looks like ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]
 
     // Check that all your push tokens appear to be valid Expo push tokens

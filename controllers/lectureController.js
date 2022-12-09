@@ -1,5 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
 const Lecture = require("../models/Lecture");
+const Session = require("../models/Session");
 const pushMsg = require("../utils/expoPushNotification");
 
 const createLecture = async (req, res) => {
@@ -29,8 +30,13 @@ const createLecture = async (req, res) => {
         status,
         codes,
       });
+
       res.status(StatusCodes.CREATED).json({ lecture });
-      pushMsg(lecture);
+      const r = await Session.findOne({
+        name: `${lecture.dep}-${lecture.year}`,
+      });
+      let tokens = r?.arr;
+      pushMsg(lecture, tokens);
     } else {
       res
         .status(StatusCodes.NOT_ACCEPTABLE)
@@ -162,7 +168,9 @@ const updateLecture = async (req, res) => {
     new: true,
   });
   res.status(StatusCodes.OK).json({ lecture });
-  pushMsg(lecture);
+  const r = await Session.findOne({ name: `${lecture.dep}-${lecture.year}` });
+  let tokens = r?.arr;
+  pushMsg(lecture, tokens);
 };
 const getDays = async (req, res) => {
   const { year, dep, limit } = req.query;
